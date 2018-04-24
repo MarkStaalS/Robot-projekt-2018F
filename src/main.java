@@ -1,3 +1,5 @@
+import java.util.concurrent.Semaphore;
+
 import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.UnregulatedMotor;
@@ -25,6 +27,35 @@ class sound {
 		 */
 		Sound.playTone(300, 500);
 	}
+	/*
+	sub MyPlayTone(unsigned int frequency, unsigned int duration)
+	{
+	    PlayToneEx(frequency, duration, 1, false);
+	}
+
+	void playMusic()
+	{
+	    MyPlayTone(440,200);
+	    Wait(240);
+	    MyPlayTone(784,200);
+	    Wait(240);
+	    MyPlayTone(740,200);
+	    Wait(240);
+	    MyPlayTone(659,200);
+	    Wait(240);
+	    MyPlayTone(659,400);
+	    Wait(480);
+	    MyPlayTone(740,200);
+	    Wait(240);
+	    Wait(480);
+	    MyPlayTone(587,400);
+	    Wait(480);
+	    MyPlayTone(659,200);
+	    Wait(240);
+	    MyPlayTone(440,400);
+	    Wait(240);
+
+	}*/
 }
 
 /*
@@ -99,12 +130,13 @@ class remoteControl extends Thread {
 }
 
 public class main {
-	public static void main(String[] args) {
+	public void main(String[] args) {
 		/*
 		 * Initialize objects
 		 */
 		detection det = new detection();
 		remoteControl rc = new remoteControl();
+		Semaphore mutex = new Semaphore(1);
 		sound s = new sound();
 		/*
 		 * Start multi threading
@@ -113,13 +145,18 @@ public class main {
 		
 		det.start();
 		rc.start();
+		
 		while(state == true) {
 			try {
-				rc.acquire(state);
+				mutex.acquire();
+				try {
+					state = false;
+					System.out.println("det modsatte af fisk");
+				} finally {
+					mutex.release();
+				}
 			} catch (Exception e) {
 				
-			} finally {
-				rc.release(state);
 			}
 		}
 		s.stop();
