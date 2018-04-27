@@ -7,6 +7,8 @@ import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.SensorPort;
 import lejos.hardware.sensor.EV3IRSensor;
 import lejos.utility.Delay;
+import java.util.concurrent.Semaphore;
+
 
 class sound {
 	public sound() {
@@ -18,14 +20,14 @@ class sound {
 		 * Sound to play at the start
 		 * TODO replace sounds
 		 */
-		Sound.playTone(100, 500);
+		
 	}
 	public void stop() {
 		/*
 		 * sound when stopping
 		 * TODO replace sounds
 		 */
-		Sound.playTone(300, 500);
+		
 	}
 	/*
 	sub MyPlayTone(unsigned int frequency, unsigned int duration)
@@ -63,102 +65,59 @@ class sound {
  */
 class detection extends Thread {
 	public void run() {
+		System.out.println("start detec");
 		/*
 		 * Initialize sensor
 		 */
-		EV3IRSensor irS = new EV3IRSensor(SensorPort.S1);
-		/*
-		 * TODO while loop , when distance is below something return false
-		 */
 		
-		/*
-		 * while loop for detecting when an object is in range of the sensor
-		 */
-		
-	}
-	public boolean obsticleInTheWay() {
-		return false;
-	}
-}
-
-/*
- * remote control and motor control
- */
-class remoteControl extends Thread {
-	boolean state;
-	
-	public void run() {
-		/*
-		 * Initialize motors
-		 */
-		UnregulatedMotor b = new UnregulatedMotor(MotorPort.B);
-		UnregulatedMotor c = new UnregulatedMotor(MotorPort.C);
-		/*
-		 * Initialize IR
-		 */
-		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
-		state = true;
-		/*
-		 * Keep looping untill 8 is pressed
-		 */
-		while(state) {
-			Delay.msDelay(25);
+		double distance = 0;
+		double minDistance = 5; 
+		while (main.state == true) {
 			/*
-			 * Get commands from remote
+			 * if statement used for detecting when distance is to close
 			 */
-			int command = ir.getRemoteCommand(1);
-			/*
-			 * TODO switch for different inputs and actions
-			 */
-			
-			/*
-			 * If 8 is pressed stop robot
-			 */
-			if(command == 8);
-				state = false;
+			if (distance >= minDistance ) {
+				try {
+					main.mutex.acquire();
+					try {
+						main.state = false;
+						System.out.println("det, end");
+					} finally {
+						main.mutex.release();
+					}
+				} catch (Exception e) {
+				}
+			}	
 		}
-		ir.close();
-		stopMotorsAndClose(b, c);
-	}
-	
-	public void stopMotorsAndClose(UnregulatedMotor b, UnregulatedMotor c) {
-		b.flt();
-		c.flt();
-		b.close();
-		c.close();
+		
 	}
 }
 
 public class main {
-	public void main(String[] args) {
+	/*
+	 * Used for communicating between threads
+	 */
+	static boolean state = true;
+	/*
+	 * Makes sure that multiple threads are not accessing the same variable simultainiously
+	 */
+	static Semaphore mutex = new Semaphore(1);
+	
+	public static void main(String[] args) {
 		/*
 		 * Initialize objects
 		 */
 		detection det = new detection();
-		remoteControl rc = new remoteControl();
-		Semaphore mutex = new Semaphore(1);
 		sound s = new sound();
 		/*
 		 * Start multi threading
 		 */
-		boolean state = true;
-		
 		det.start();
-		rc.start();
 		
-		while(state == true) {
-			try {
-				mutex.acquire();
-				try {
-					state = false;
-					System.out.println("det modsatte af fisk");
-				} finally {
-					mutex.release();
-				}
-			} catch (Exception e) {
-				
-			}
-		}
+		/*
+		 * TODO insert rc commands, if needed can be a while true loop
+		 */
+
 		s.stop();
 	}
 }
