@@ -72,7 +72,7 @@ class detection extends Thread {
 		
 		double distance = 0;
 		double minDistance = 5; 
-		while (main.state == true) {
+		while (true) {
 			/*
 			 * if statement used for detecting when distance is to close
 			 */
@@ -87,9 +87,13 @@ class detection extends Thread {
 					}
 				} catch (Exception e) {
 				}
-			}	
+			} else {
+				main.state = true;
+			}
 		}
-		
+		/*
+		 * evt. running avg
+		 */
 	}
 }
 
@@ -117,7 +121,10 @@ public class main {
 		/*
 		 * TODO insert rc commands, if needed can be a while true loop
 		 */
-
+		
+		/*
+		 * If statement , knap trykket og detetcion == false,
+		 */
 		s.stop();
 	}
 }
