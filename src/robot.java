@@ -56,7 +56,7 @@ class sound {
  */
 class detection extends Thread {
 	public void run() {
-		robot.detectionLoop = true;
+		robot.detection = true;
 		double stopDistance = 0.1; 
 		/*
 		 * Initialize sensor
@@ -70,7 +70,7 @@ class detection extends Thread {
 			/*
 			 * if statement used for detecting when distance is to close
 			 */
-			if ( ranger.getRange() < stopDistance ) robot.detectionLoop = false;	
+			if ( ranger.getRange() < stopDistance ) robot.detection = false;	
 		}
 		/*
 		 * Close sensor and alocated resources
@@ -84,7 +84,7 @@ public class robot  {
 	 * Variables used for communicating between threads
 	 */
 	static Boolean mainLoop = true;
-	static Boolean detectionLoop = true;
+	static Boolean detection = true;
 	/*
 	 * Initialize motors
 	 */
@@ -111,50 +111,53 @@ public class robot  {
 		/*
 		 * Loop for handling inputs from remote 
 		 */
-		while(mainLoop ) {
+		while(mainLoop) {
 			Delay.msDelay(25);
 			/*
 			 *  Get and act upon the IR commands
 			 *  If there is an obstical do not move any further
 			 */
-			if (command == 1 && detectionLoop == true) forward( 50);
-			else if (command == 2 && detectionLoop == true) backward( 50);
-			else if (command ==3 && detectionLoop == true) right(25);
-			else if(command == 4 && detectionLoop == true) left(25);
+			if (command == 1 && detection == true) forward( 50);
+			else if (command == 2 && detection == true) backward( 50);
+			else if (command ==3 && detection == true) right(25);
+			else if(command == 4 && detection == true) left(25);
 			if(command == 8) mainLoop = false;
 		}
 		/*
-		 * Closing motors and playing final sound
+		 * Closing devices
 		 */
 		ir.close();
 		finish();
+		/*
+		 * Playing stop sound
+		 */
 		s.stop();
 	}
 
-	static void forward( int pow){
-		b.setPower(pow);
-		c.setPower(pow);
+	static void forward(int power){
+		b.setPower(power);
+		c.setPower(power);
 		b.forward();
 		c.forward();
 		Delay.msDelay(25);
 	}
 	
-	static void backward( int pow){
-		b.setPower(pow);
-		c.setPower(pow);
+	static void backward(int power){
+		b.setPower(power);
+		c.setPower(power);
 		b.backward();
 		c.backward();
 		Delay.msDelay(25);
 	}
 	
-	static void right( int pow){
-		b.setPower(pow);
+	static void right(int power){
+		b.setPower(power);
 		b.forward();
 		Delay.msDelay(25);
 	}
 	
-	static void left( int pow){
-		c.setPower(pow);
+	static void left(int power){
+		c.setPower(power);
 		c.forward();
 		Delay.msDelay(25);
 	}
