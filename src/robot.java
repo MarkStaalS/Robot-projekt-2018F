@@ -56,7 +56,7 @@ class sound {
  */
 class detection extends Thread {
 	public void run() {
-		robot.detection = true;
+		robot.detection = false;
 		double stopDistance = 0.1; 
 		/*
 		 * Initialize sensor
@@ -70,7 +70,7 @@ class detection extends Thread {
 			/*
 			 * if statement used for detecting when distance is to close
 			 */
-			if ( ranger.getRange() < stopDistance ) robot.detection = false;	
+			if ( ranger.getRange() < stopDistance ) robot.detection = true;	
 		}
 		/*
 		 * Close sensor and alocated resources
@@ -97,12 +97,12 @@ class control{
 			 *  Get and act upon the IR commands
 			 *  If there is an obstical do not move any further
 			 */
-			if (robot.detection == false) stop();
-			if (command == 1 && robot.detection == true) forward(50);
-			else if (command == 2 && robot.detection == true) backward(50);
-			else if (command ==3 && robot.detection == true) right(25);
-			else if(command == 4 && robot.detection == true) left(25);
-			if(command == 8) robot.mainLoop = false;
+			if (robot.detection == true) stop();
+			else if (command == 1 && robot.detection == false) forward(50);
+			else if (command == 2 && robot.detection == false) backward(50);
+			else if (command ==3 && robot.detection == false) right(25);
+			else if(command == 4 && robot.detection == false) left(25);
+			else if(command == 8) robot.mainLoop = false;
 		}
 		/*
 		 * Closing devices
@@ -156,7 +156,7 @@ public class robot  {
 	 * Variables used for communicating between threads
 	 */
 	static Boolean mainLoop = true;
-	static Boolean detection = true;
+	static Boolean detection = false;
 	/*
 	 * Initialize motors
 	 */
@@ -187,6 +187,4 @@ public class robot  {
 		 */
 		s.stop();
 	}
-
-	
 }
