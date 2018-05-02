@@ -78,7 +78,79 @@ class detection extends Thread {
 		us.close();
 	}
 }
-
+/*
+ * Control loop
+ */
+class control{
+	public control() {
+	}
+	
+	static void controlLoop(){
+		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
+		int command = ir.getRemoteCommand(1);
+		/*
+		 * Loop for handling inputs from remote 
+		 */
+		while(robot.mainLoop) {
+			Delay.msDelay(25);
+			/*
+			 *  Get and act upon the IR commands
+			 *  If there is an obstical do not move any further
+			 */
+			if (robot.detection == false) stop();
+			if (command == 1 && robot.detection == true) forward(50);
+			else if (command == 2 && robot.detection == true) backward(50);
+			else if (command ==3 && robot.detection == true) right(25);
+			else if(command == 4 && robot.detection == true) left(25);
+			if(command == 8) robot.mainLoop = false;
+		}
+		/*
+		 * Closing devices
+		 */
+		ir.close();
+		finish();
+	}
+	private static void forward(int power){
+		robot.b.setPower(power);
+		robot.c.setPower(power);
+		robot.b.forward();
+		robot.c.forward();
+		Delay.msDelay(25);
+	}
+	
+	private static void backward(int power){
+		robot.b.setPower(power);
+		robot.c.setPower(power);
+		robot.b.backward();
+		robot.c.backward();
+		Delay.msDelay(25);
+	}
+	
+	private static void right(int power){
+		robot.b.setPower(power);
+		robot.b.forward();
+		Delay.msDelay(25);
+	}
+	
+	private static void left(int power){
+		robot.c.setPower(power);
+		robot.c.forward();
+		Delay.msDelay(25);
+	}
+	
+	private static void stop() {
+		robot.b.flt();
+		robot.c.flt();
+		Delay.msDelay(25);
+	}
+	
+	private static void finish(){
+		robot.b.flt();
+		robot.c.flt();
+		robot.b.close();
+		robot.c.close();
+	}	
+}
 public class robot  {
 	/*
 	 * Variables used for communicating between threads
@@ -97,9 +169,7 @@ public class robot  {
 		 */
 		detection det = new detection();
 		sound s = new sound();
-		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
-		
-		int command = ir.getRemoteCommand(1);
+		control ctrl = new control();
 		/*
 		 * Start multi threading
 		 */
@@ -109,63 +179,14 @@ public class robot  {
 		 */
 		s.start();
 		/*
-		 * Loop for handling inputs from remote 
+		 * run control loop
 		 */
-		while(mainLoop) {
-			Delay.msDelay(25);
-			/*
-			 *  Get and act upon the IR commands
-			 *  If there is an obstical do not move any further
-			 */
-			if (command == 1 && detection == true) forward( 50);
-			else if (command == 2 && detection == true) backward( 50);
-			else if (command ==3 && detection == true) right(25);
-			else if(command == 4 && detection == true) left(25);
-			if(command == 8) mainLoop = false;
-		}
-		/*
-		 * Closing devices
-		 */
-		ir.close();
-		finish();
+		ctrl.controlLoop();
 		/*
 		 * Playing stop sound
 		 */
 		s.stop();
 	}
 
-	static void forward(int power){
-		b.setPower(power);
-		c.setPower(power);
-		b.forward();
-		c.forward();
-		Delay.msDelay(25);
-	}
 	
-	static void backward(int power){
-		b.setPower(power);
-		c.setPower(power);
-		b.backward();
-		c.backward();
-		Delay.msDelay(25);
-	}
-	
-	static void right(int power){
-		b.setPower(power);
-		b.forward();
-		Delay.msDelay(25);
-	}
-	
-	static void left(int power){
-		c.setPower(power);
-		c.forward();
-		Delay.msDelay(25);
-	}
-	
-	static void finish(){
-		b.flt();
-		c.flt();
-		b.close();
-		c.close();
-	}
 }
