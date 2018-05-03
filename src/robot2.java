@@ -115,11 +115,11 @@ public class robot2  {
 		int i = 0;
 		while(mainLoop ) {
 			Delay.msDelay(25);
-			System.out.println("main loop");
+			System.out.println("com" + command);
 			/*
 			 *  Get and act upon the IR commands
 			 *  If there is an obstical do not move any further
-			 */
+			 *
 			if (command == 1 && detectionLoop == true) {
 				forward( 50);
 			}
@@ -135,11 +135,7 @@ public class robot2  {
 			else if(command == 8) {
 				mainLoop = false;
 			}
-			
-			if (i == 100000) {
-				mainLoop = false;
-			}
-			i++;
+			*/
 		}
 		/*
 		 * Closing motors and playing final sound
