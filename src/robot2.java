@@ -132,10 +132,25 @@ public class robot2  {
 			else if(command == 4 && detectionLoop == true) {
 				left(25);
 			}*/
+			LCD.drawString("COM:" + command + " ", 0, 2);
+			if (command == 1) {
+				forward( 50);
+			}
+			else if (command == 2) {
+				backward( 50);
+			}
+			else if (command ==3) {
+				right(25);
+			}
+			else if(command == 4) {
+				left(25);
+			}
+			else {
+				
+			}
 			if(command == 8) {
 				mainLoop = false;
 			}
-			
 		}
 		/*
 		 * Closing motors and playing final sound
