@@ -23,6 +23,7 @@ class sound {
 		 */
 		Delay.msDelay(240);
 	    Sound.playTone(784,200);
+	    /*
 	    Delay.msDelay(240);
 	    Sound.playTone(740,200);
 	    Delay.msDelay(240);
@@ -39,6 +40,7 @@ class sound {
 	    Delay.msDelay(240);
 	    Sound.playTone(440,400);
 	    Delay.msDelay(240);
+	    */
 	}
 	public void stop() {
 		/*
@@ -100,10 +102,10 @@ class control{
 			 *  If there is an obstical do not move any further
 			 */
 			//if (robot.detection == true) stop();
-			if (command == 1 && robot.detection == false) forward(50);
-			else if (command == 2 && robot.detection == false) backward(50);
-			else if (command ==3 && robot.detection == false) right(25);
-			else if(command == 4 && robot.detection == false) left(25);
+			if (command == 1 && robot.detection == true) forward(50);
+			else if (command == 2 && robot.detection == true) backward(50);
+			else if (command ==3 && robot.detection == true) right(25);
+			else if(command == 4 && robot.detection == true) left(25);
 			if(command == 8) robot.mainLoop = false;
 		}
 		/*
@@ -158,7 +160,7 @@ public class robot  {
 	 * Variables used for communicating between threads
 	 */
 	static Boolean mainLoop = true;
-	static Boolean detection = false;
+	static Boolean detection = true;
 	/*
 	 * Initialize motors
 	 */
