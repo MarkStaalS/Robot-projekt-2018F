@@ -131,11 +131,11 @@ public class robot2  {
 			}
 			else if(command == 4 && detectionLoop == true) {
 				left(25);
-			}
-			else if(command == 8) {
+			}*/
+			if(command == 8) {
 				mainLoop = false;
 			}
-			*/
+			
 		}
 		/*
 		 * Closing motors and playing final sound
