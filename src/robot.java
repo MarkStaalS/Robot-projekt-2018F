@@ -59,7 +59,7 @@ class sound {
 class detection extends Thread {
 	public void run() {
 		System.out.println("det start");
-		robot.detection = false;
+		robot.detection = true;
 		double stopDistance = 0.1; 
 		/*
 		 * Initialize sensor
@@ -73,7 +73,8 @@ class detection extends Thread {
 			/*
 			 * if statement used for detecting when distance is to close
 			 */
-			if ( ranger.getRange() < stopDistance ) robot.detection = true;	
+			if ( ranger.getRange() < stopDistance ) robot.detection = false;
+			else robot.detection = true;
 		}
 		/*
 		 * Close sensor and alocated resources
@@ -107,7 +108,7 @@ class control{
 			else if (command == 2 && robot.detection == true) backward(50);
 			else if (command ==3 && robot.detection == true) right(25);
 			else if(command == 4 && robot.detection == true) left(25);
-			if(command == 8) robot.mainLoop = false;
+			else if(command == 8) robot.mainLoop = false;
 		}
 		/*
 		 * Closing devices
@@ -202,11 +203,15 @@ public class robot  {
 			 */
 			System.out.println("mooving");
 			//if (robot.detection == true) stop();
-			if (command == 1 && robot.detection == true) forward(50);
-			else if (command == 2 && robot.detection == true) backward(50);
-			else if (command ==3 && robot.detection == true) right(25);
-			else if(command == 4 && robot.detection == true) left(25);
-			if(command == 8) robot.mainLoop = false;
+			if (command == 1 && robot.detection == true) 
+				forward(50);
+			else if (command == 2 && robot.detection == true) 
+				backward(50);
+			else if (command ==3 && robot.detection == true) 
+				right(25);
+			else if(command == 4 && robot.detection == true) 
+				left(25);
+			else if(command == 8) robot.mainLoop = false;
 		}
 		/*
 		 * Closing devices
