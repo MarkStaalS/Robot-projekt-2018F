@@ -96,7 +96,7 @@ public class robot2  {
 		/*
 		 * Initialize objects
 		 */
-		detection det = new detection();
+		//detection det = new detection();
 		sound s = new sound();
 		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
 		
@@ -104,7 +104,7 @@ public class robot2  {
 		/*
 		 * Start multi threading
 		 */
-		det.start();
+		//det.start();
 		/*
 		 * Play start melody
 		 */
@@ -113,7 +113,7 @@ public class robot2  {
 		 * Loop for handling inputs from remote 
 		 */
 		int i = 0;
-		while(mainLoop ) {
+		while(mainLoop == true) {
 			Delay.msDelay(25);
 			System.out.println("com" + command);
 			/*
@@ -134,12 +134,12 @@ public class robot2  {
 			}*/
 			LCD.drawString("COM:" + command + " ", 0, 2);
 			if (command == 1) {
-				forward( 50);
+				forward(50);
 			}
 			else if (command == 2) {
-				backward( 50);
+				backward(50);
 			}
-			else if (command ==3) {
+			else if (command == 3) {
 				right(25);
 			}
 			else if(command == 4) {
