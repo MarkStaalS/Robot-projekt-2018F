@@ -56,6 +56,7 @@ class sound {
  */
 class detection extends Thread {
 	public void run() {
+		System.out.println("det start");
 		robot.detection = false;
 		double stopDistance = 0.1; 
 		/*
@@ -88,21 +89,22 @@ class control{
 	static void controlLoop(){
 		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
 		int command = ir.getRemoteCommand(1);
+		System.out.println("ctrl loop");
 		/*
 		 * Loop for handling inputs from remote 
 		 */
-		while(robot.mainLoop) {
+		while(robot.mainLoop == true) {
 			Delay.msDelay(25);
 			/*
 			 *  Get and act upon the IR commands
 			 *  If there is an obstical do not move any further
 			 */
-			if (robot.detection == true) stop();
-			else if (command == 1 && robot.detection == false) forward(50);
+			//if (robot.detection == true) stop();
+			if (command == 1 && robot.detection == false) forward(50);
 			else if (command == 2 && robot.detection == false) backward(50);
 			else if (command ==3 && robot.detection == false) right(25);
 			else if(command == 4 && robot.detection == false) left(25);
-			else if(command == 8) robot.mainLoop = false;
+			if(command == 8) robot.mainLoop = false;
 		}
 		/*
 		 * Closing devices
@@ -164,6 +166,7 @@ public class robot  {
 	static UnregulatedMotor c = new UnregulatedMotor(MotorPort.C);
 	
 	public static void main(String[] args) {
+		System.out.println("start");
 		/*
 		 * Initialize objects
 		 */
