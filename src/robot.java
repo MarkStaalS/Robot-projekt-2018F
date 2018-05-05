@@ -9,17 +9,42 @@ import lejos.hardware.sensor.EV3UltrasonicSensor;
 import lejos.hardware.sensor.SensorMode;
 import lejos.robotics.RangeFinderAdapter;
 
+/*
+ * Class is a colection of code that has a functionality,
+ * Normal pratice is to keep functionality to a single purpose
+ */
 class sound {
 	/*
-	 * Constructor
+	 * 3 spaces, designates who has access to what:
+	 * 
+	 * Private, here we have functions that should not be accessed from the outside, e.g flag for when 
+	 * 	we are about to drive into a wall.
+	 * 
+	 * Public, everybody has access, things we use to interact with the class (methods and variables)
+	 * 	Normal pratice: it is common that variables are private and can only be changed using set and get methods
+	 * 
+	 * Protected, no further comment
+	 */
+	
+	/*
+	 * Constructor, multiple types, this is how we create instances of that class
+	 * 
+	 * Normal:
+	 * without arguments or parameters
+	 * 
+	 * Overload:
+	 * Means that it has a set of arguments/parameters that is used when creating the object
+	 * Way of instanciation the object with the desired attributes
 	 */
 	public sound() {
-	}
-	
-	public void start() {
 		/*
-		 * Sound to play at the start
+		 * We can have code here that runs when the object is created (once) 
 		 */
+	}
+	/*
+	 * Function/ method, collection of code that can be called and executed
+	 */
+	public void playStartMelody() {
 		Delay.msDelay(240);
 	    Sound.playTone(784,200);
 	    Delay.msDelay(240);
@@ -40,10 +65,7 @@ class sound {
 	    Delay.msDelay(240);
 	}
 	
-	public void stop() {
-		/*
-		 * sound when stopping
-		 */
+	public void playStopMelody() {
 	    Sound.playTone(784,200);
 	    Delay.msDelay(240);
 	    Sound.playTone(740,200);
@@ -51,22 +73,32 @@ class sound {
 }
 
 /*
- * handles detection of objects
+ * handles detection of obstacles in path
  */
 class detection extends Thread {
 	public void run() {
+		/*
+		 * Global variable
+		 */
 		robot.detection = false;
 		/*
 		 * Local variable
 		 */
 		double stopDistance = 0.1; 
 		/*
-		 * Initialize sensor
+		 * Initialize sensor, creating instances of classes from libraries 
 		 */
 		EV3UltrasonicSensor us = new EV3UltrasonicSensor(SensorPort.S1);
 		SensorMode distMode = us.getMode("Distance");
 		RangeFinderAdapter ranger = new RangeFinderAdapter(distMode);
-		
+		/*
+		 * Check condition in the start of the loop:
+		 * for loop, is used when iterating over a set of values such as i++
+		 * while loop, is dependent on other factors, such as when driving into a wall
+		 * 
+		 * Checks condition in the bottom of the loop:
+		 * do while, we will always run the code atleast once
+		 */
 		while (robot.mainLoop == true) {
 			/*
 			 * Prints the current command to the ev3
@@ -76,15 +108,19 @@ class detection extends Thread {
 			/*
 			 * if statement used for detecting when distance is to close
 			 */
-			if ( ranger.getRange() < stopDistance ) robot.detection = true;
-			else robot.detection = false;
+			if ( ranger.getRange() < stopDistance )
+				robot.detection = true;
+			else
+				robot.detection = false;
 		}
 		/*
-		 * Close sensor and alocated resources
+		 * Close sensor and free up resources
+		 * The associatet resources in the CPU are freed up for use in other applications
 		 */
 		us.close();
 	}
 }
+
 /*
  * Control loop
  */
@@ -95,7 +131,7 @@ class control{
 	public control() {
 	}
 	
-	static void controlLoop(){
+	public static void controlLoop(){
 		EV3IRSensor ir = new EV3IRSensor(SensorPort.S4);
 		/*
 		 * Loop for handling inputs from remote 
@@ -111,17 +147,27 @@ class control{
 			 */
 			LCD.drawString("COM:" + command + " ", 0, 2);
 			/*
-			 *  If there is an obstical do not move any further, when obstical is gone start moving again
+			 *  If there is an obstacle do not move any further, when obstacle is gone start moving again
 			 */
-			if (command == 1 && robot.detection == false) forward(100);
-			else if (command == 2 && robot.detection == false) backward(100);
-			else if (command ==3 && robot.detection == false) right(50);
-			else if(command == 4 && robot.detection == false) left(50);
-			else if(command == 8) robot.mainLoop = false;
-			else stop();
+			if (robot.detection == false) {
+				switch (command) {
+					case 1:
+						forward(100); break;
+					case 2:
+						backward(100); break;
+					case 3:
+						right(50); break;
+					case 4:
+						left(50); break;
+					case 8:
+						robot.mainLoop = false; break;
+					default:
+						stop();
+				}	
+			}
 		}
 		/*
-		 * Closing devices
+		 * Closing devices and freeing up resources
 		 */
 		ir.close();
 		finish();
@@ -167,41 +213,46 @@ class control{
 		robot.c.close();
 	}	
 }
-public class robot  {
+
+public class robot {
 	/*
 	 * Class variables used for communicating between threads
 	 */
-	static Boolean mainLoop = true;
-	static Boolean detection = false;
+	static Boolean mainLoop;
+	static Boolean detection;
 	/*
 	 * Initialize motors
 	 */
-	static UnregulatedMotor b = new UnregulatedMotor(MotorPort.B);
-	static UnregulatedMotor c = new UnregulatedMotor(MotorPort.C);
+	static UnregulatedMotor b;
+	static UnregulatedMotor c;
+	
+	public robot() {
+		/*
+		 * These variables needs to be set once before the program runs
+		 */
+		mainLoop = true;
+		detection = false;
+		b = new UnregulatedMotor(MotorPort.B);
+		c = new UnregulatedMotor(MotorPort.C);
+	}
 	
 	public static void main(String[] args) {
 		System.out.println("start");
 		/*
-		 * Declaration of objects
+		 * Instanciating of objects
 		 */
 		detection det = new detection();
 		sound s = new sound();
 		control ctrl = new control();
 		/*
-		 * Start multi threading 
+		 * Start multi-threading 
 		 */
 		det.start();
-		/*
-		 * Play start melody, access method from other class
-		 */
-		s.start();
+		s.playStartMelody();
 		/*
 		 * Run control loop
 		 */
 		ctrl.controlLoop();
-		/*
-		 * Playing stop sound
-		 */
-		s.stop();
+		s.playStopMelody();
 	}
 }
